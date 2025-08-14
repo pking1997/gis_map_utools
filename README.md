@@ -3,9 +3,9 @@
 收集与托管常用 GIS 地图小工具的静态站点，支持 GitHub Pages 自动部署。
 
 ## 在线访问
-- 打开首页：`https://<你的 GitHub 用户名>.github.io/gis_map_utools/`
-- 现有工具：`GIS Data Collection` → `https://<你的 GitHub 用户名>.github.io/gis_map_utools/gisDataCollection.html`
- - 新增工具：`坐标系转换` → `https://<你的 GitHub 用户名>.github.io/gis_map_utools/coordConverter.html`
+- 打开首页：`https://pking1997.github.io/gis_map_utools/`
+- 现有工具：`GIS Data Collection` → `https://pking1997.github.io/gis_map_utools/gisDataCollection.html`
+- 新增工具：`坐标系转换` → `https://pking1997.github.io/gis_map_utools/coordConverter.html`
 
 ## 本地开发
 1. 克隆仓库并进入目录。
@@ -32,12 +32,13 @@ coordConverter.html        # 坐标系转换（WGS84/GCJ-02/BD-09）
 assets/
   css/styles.css           # 基础样式（深浅色适配）
   js/main.js               # 首页交互逻辑
+  js/layout.js             # 统一页头页脚注入脚本
 .nojekyll                  # 禁用 Jekyll 以便静态资源无障碍访问
 .github/workflows/pages.yml# GitHub Pages 自动部署
 ```
 
 ## 后续规划
-- 坐标转换：WGS84 / GCJ-02 / BD-09 互转
+- 坐标转换：WGS84 / GCJ-02 / BD-09 互转 ✅
 - WKT / GeoJSON 转换与校验
 - 瓦片编号（XYZ / TMS）与范围可视化
 - 量算工具（长度、面积）
