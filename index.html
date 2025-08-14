@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="GIS 地图工具集合，快速访问和使用日常地图相关的小工具。"/>
+  <title>GIS Map UTools · 首页</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg"/>
+  <link rel="stylesheet" href="assets/css/styles.css"/>
+  <meta name="color-scheme" content="light dark"/>
+</head>
+<body>
+  <header class="site-header">
+    <div class="layout-container">
+      <div class="brand">
+        <span class="logo">🗺️</span>
+        <span class="title">GIS Map UTools</span>
+      </div>
+      <nav class="site-nav">
+        <a class="nav-link" href="https://github.com/pking1997/gis_map_utools" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main layout-container">
+    <section class="intro">
+      <h1>地图工具合集</h1>
+      <p>这里收集并托管了常用的 GIS 小工具页面，支持在 GitHub Pages 上自动部署与访问。</p>
+      <div class="actions">
+        <input id="tool-search" class="search-input" type="search" placeholder="搜索工具名称或关键词…" aria-label="搜索工具"/>
+      </div>
+    </section>
+
+    <section class="tool-grid" id="tool-grid" aria-live="polite">
+      <a class="tool-card" href="coordConverter.html" data-tags="坐标 转换 wgs84 gcj02 bd09 经纬度 coordinate">
+        <div class="tool-card-body">
+          <h2 class="tool-title">坐标系转换</h2>
+          <p class="tool-desc">WGS84、GCJ-02、BD-09 互转，支持批量经纬度转换与格式化。</p>
+        </div>
+        <div class="tool-card-meta">
+          <span class="badge">坐标</span>
+          <span class="badge">工具</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="gisDataCollection.html" data-tags="gis 地图 数据 采集 collection baidu">
+        <div class="tool-card-body">
+          <h2 class="tool-title">GIS Data Collection</h2>
+          <p class="tool-desc">交互式采集与查看地图要素属性，支持百度地图底图与可视化扩展。</p>
+        </div>
+        <div class="tool-card-meta">
+          <span class="badge">地图</span>
+          <span class="badge">工具</span>
+        </div>
+      </a>
+
+      <div class="tool-card tool-card--disabled" aria-disabled="true">
+        <div class="tool-card-body">
+          <h2 class="tool-title">更多工具 · 敬请期待</h2>
+          <p class="tool-desc">后续将持续添加坐标转换、WKT/GeoJSON 工具、瓦片编号、量算等。</p>
+        </div>
+        <div class="tool-card-meta">
+          <span class="badge">规划</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="layout-container">
+      <p>2025 GIS Map UTools · 由 GitHub Pages 自动部署</p>
+      <p class="hint">提示：将此页面加入浏览器收藏，快速访问所有工具。</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
+
+

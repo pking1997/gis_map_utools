@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>坐标系转换 · GIS Map UTools</title>
+  <link rel="stylesheet" href="assets/css/styles.css"/>
+  <style>
+    .wrap{max-width:920px;margin:0 auto;padding:20px}
+    .card{border:1px solid #202637;border-radius:12px;padding:16px;background:linear-gradient(180deg,#0e121a,#0b0d12)}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .col{flex:1 1 260px}
+    label{display:block;margin-bottom:6px;color:#9aa4b2}
+    input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #202637;background:#0e1117;color:#e6eaf2;outline:none}
+    textarea{min-height:88px}
+    .btn{display:inline-block;background:#3b82f6;color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer}
+    .btn.secondary{background:#374151}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .muted{color:#9aa4b2}
+    .mt{margin-top:12px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .small{font-size:12px}
+    @media (prefers-color-scheme: light){
+      .card{background:linear-gradient(180deg,#fff,#f9fafb);border-color:#e5e7eb}
+      input,select,textarea{background:#fff;border-color:#e5e7eb;color:#0f172a}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>坐标系转换</h1>
+    <p class="muted">在 WGS84、GCJ-02（国测局火星坐标）、BD-09（百度）之间进行互转。支持单点与批量（经纬度对，每行一组，逗号或空格分隔）。</p>
+
+    <div class="card mt">
+      <div class="row">
+        <div class="col">
+          <label>输入坐标系</label>
+          <select id="from">
+            <option value="wgs84">WGS84</option>
+            <option value="gcj02">GCJ-02</option>
+            <option value="bd09">BD-09</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>输出坐标系</label>
+          <select id="to">
+            <option value="gcj02">GCJ-02</option>
+            <option value="wgs84">WGS84</option>
+            <option value="bd09">BD-09</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row mt">
+        <div class="col">
+          <label>输入（lon,lat 或 lon lat，每行一组）</label>
+          <textarea id="input" placeholder="示例：\n116.397128,39.916527\n121.473701 31.230416"></textarea>
+          <div class="small muted mt">经度在前、纬度在后。自动忽略空行与无效值。</div>
+        </div>
+        <div class="col">
+          <label>输出</label>
+          <textarea id="output" readonly placeholder="转换结果将显示在这里"></textarea>
+        </div>
+      </div>
+
+      <div class="row mt">
+        <div class="col">
+          <button class="btn" id="run">转换</button>
+          <button class="btn secondary" id="swap">交换方向</button>
+          <button class="btn secondary" id="clear">清空</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="small muted mt">精度说明：常见算法在米级范围内具备工程可用精度，严肃测绘请使用权威工具链。</p>
+  </div>
+
+  <script>
+  (function(){
+    // 坐标转换算法（无外部依赖）
+    var PI = Math.PI;
+    var AXIS = 6378245.0;
+    var EE = 0.00669342162296594323;
+
+    function outOfChina(lon, lat){
+      return lon < 72.004 || lon > 137.8347 || lat < 0.8293 || lat > 55.8271;
+    }
+    function transformLat(x, y){
+      var ret = -100.0 + 2.0*x + 3.0*y + 0.2*y*y + 0.1*x*y + 0.2*Math.sqrt(Math.abs(x));
+      ret += (20.0*Math.sin(6.0*x*PI) + 20.0*Math.sin(2.0*x*PI))*2.0/3.0;
+      ret += (20.0*Math.sin(y*PI) + 40.0*Math.sin(y/3.0*PI))*2.0/3.0;
+      ret += (160.0*Math.sin(y/12.0*PI) + 320*Math.sin(y*PI/30.0))*2.0/3.0;
+      return ret;
+    }
+    function transformLon(x, y){
+      var ret = 300.0 + x + 2.0*y + 0.1*x*x + 0.1*x*y + 0.1*Math.sqrt(Math.abs(x));
+      ret += (20.0*Math.sin(6.0*x*PI) + 20.0*Math.sin(2.0*x*PI))*2.0/3.0;
+      ret += (20.0*Math.sin(x*PI) + 40.0*Math.sin(x/3.0*PI))*2.0/3.0;
+      ret += (150.0*Math.sin(x/12.0*PI) + 300.0*Math.sin(x/30.0*PI))*2.0/3.0;
+      return ret;
+    }
+    function delta(lon, lat){
+      var dLat = transformLat(lon-105.0, lat-35.0);
+      var dLon = transformLon(lon-105.0, lat-35.0);
+      var radLat = lat/180.0*PI;
+      var magic = Math.sin(radLat);
+      magic = 1 - EE*magic*magic;
+      var sqrtMagic = Math.sqrt(magic);
+      dLat = (dLat*180.0)/((AXIS*(1-EE))/(magic*sqrtMagic)*PI);
+      dLon = (dLon*180.0)/(AXIS/ sqrtMagic * Math.cos(radLat)*PI);
+      return {lon:dLon, lat:dLat};
+    }
+    function wgs84ToGcj02(lon, lat){
+      if(outOfChina(lon, lat)) return {lon:lon, lat:lat};
+      var d = delta(lon,lat);
+      return {lon: lon + d.lon, lat: lat + d.lat};
+    }
+    function gcj02ToWgs84(lon, lat){
+      if(outOfChina(lon, lat)) return {lon:lon, lat:lat};
+      var d = delta(lon,lat);
+      return {lon: lon - d.lon, lat: lat - d.lat};
+    }
+    function gcj02ToBd09(lon, lat){
+      var z = Math.sqrt(lon*lon + lat*lat) + 0.00002*Math.sin(lat*PI);
+      var theta = Math.atan2(lat, lon) + 0.000003*Math.cos(lon*PI);
+      return {lon: z*Math.cos(theta) + 0.0065, lat: z*Math.sin(theta) + 0.006};
+    }
+    function bd09ToGcj02(lon, lat){
+      var x = lon - 0.0065;
+      var y = lat - 0.006;
+      var z = Math.sqrt(x*x + y*y) - 0.00002*Math.sin(y*PI);
+      var theta = Math.atan2(y, x) - 0.000003*Math.cos(x*PI);
+      return {lon: z*Math.cos(theta), lat: z*Math.sin(theta)};
+    }
+    function wgs84ToBd09(lon, lat){
+      var g = wgs84ToGcj02(lon,lat); return gcj02ToBd09(g.lon,g.lat);
+    }
+    function bd09ToWgs84(lon, lat){
+      var g = bd09ToGcj02(lon,lat); return gcj02ToWgs84(g.lon,g.lat);
+    }
+
+    function convert(from, to, lon, lat){
+      if(from===to) return {lon:lon, lat:lat};
+      if(from==='wgs84'&&to==='gcj02') return wgs84ToGcj02(lon,lat);
+      if(from==='gcj02'&&to==='wgs84') return gcj02ToWgs84(lon,lat);
+      if(from==='gcj02'&&to==='bd09') return gcj02ToBd09(lon,lat);
+      if(from==='bd09'&&to==='gcj02') return bd09ToGcj02(lon,lat);
+      if(from==='wgs84'&&to==='bd09') return wgs84ToBd09(lon,lat);
+      if(from==='bd09'&&to==='wgs84') return bd09ToWgs84(lon,lat);
+      return {lon:lon, lat:lat};
+    }
+
+    // UI 逻辑
+    var $ = function(id){ return document.getElementById(id); };
+    var fromSel = $('from');
+    var toSel = $('to');
+    var input = $('input');
+    var output = $('output');
+
+    function parseLine(line){
+      var s = line.trim().replace(/[\s,]+/g,' ');
+      var seg = s.split(' ');
+      if(seg.length<2) return null;
+      var lon = parseFloat(seg[0]);
+      var lat = parseFloat(seg[1]);
+      if(!isFinite(lon) || !isFinite(lat)) return null;
+      return {lon:lon, lat:lat};
+    }
+
+    function format(val){ return val.toFixed(6); }
+
+    function run(){
+      var from = fromSel.value; var to = toSel.value;
+      var lines = input.value.split(/\r?\n/);
+      var out = [];
+      for(var i=0;i<lines.length;i++){
+        var l = lines[i]; if(!l.trim()) continue;
+        var p = parseLine(l); if(!p){ out.push('# 行 '+(i+1)+' 无效'); continue; }
+        var r = convert(from,to,p.lon,p.lat);
+        out.push(format(r.lon)+","+format(r.lat));
+      }
+      output.value = out.join('\n');
+    }
+
+    $('run').addEventListener('click', run);
+    $('clear').addEventListener('click', function(){ input.value=''; output.value=''; });
+    $('swap').addEventListener('click', function(){
+      var a = fromSel.value; fromSel.value = toSel.value; toSel.value = a;
+      run();
+    });
+  })();
+  </script>
+</body>
+<script src="assets/js/layout.js"></script>
+</html>
+
+

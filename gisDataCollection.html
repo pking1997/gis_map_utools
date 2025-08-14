@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"/>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .control-panel {
+            width: 460px;
+            background: #f5f5f5;
+            border-left: 1px solid #ddd;
+            padding: 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        
+        .control-section {
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .control-section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 16px;
+            border-bottom: 2px solid #4287f5;
+            padding-bottom: 8px;
+        }
+        
+        .json-input {
+            width: 100%;
+            height: 120px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        
+        .parse-btn {
+            background: #4287f5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .parse-btn:hover {
+            background: #3367d6;
+        }
+        
+        .parse-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .property-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+        
+        .property-header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .property-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .property-item:hover {
+            background: #f0f8ff;
+        }
+        
+        .property-item:last-child {
+            border-bottom: none;
+        }
+        
+        .property-name {
+            flex: 0 0 120px;
+            font-weight: 500;
+            color: #333;
+            font-size: 13px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            padding-right: 10px;
+        }
+        
+        .property-value {
+            flex: 1;
+            color: #666;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+        }
+        
+        .property-value:hover::after {
+            content: attr(data-full-value);
+            position: absolute;
+            left: 0;
+            top: 100%;
+            background: #333;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: normal;
+            max-width: 200px;
+            word-wrap: break-word;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .property-controls {
+            display: flex;
+            gap: 10px;
+            margin-left: 10px;
+        }
+        
+        .wkt-radio {
+            margin: 0;
+        }
+        
+        .label-checkbox {
+            margin: 0;
+        }
+        
+        .wkt-badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        .label-badge {
+            background: #4ecdc4;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-buttons-title {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .clear-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background: #ff5252;
+        }
+        
+        .render-btn {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .render-btn:hover {
+            background: #45b7aa;
+        }
+        
+        .status-message {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .layer-control {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 999;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        .layer-control div {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .layer-control div:last-child {
+            margin-bottom: 0;
+        }
+        
+        .layer-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+        
+        .data-layer-icon {
+            background-color: #4287f5;
+        }
+        
+        .label-layer-icon {
+            background-color: #4ecdc4;
+        }
+        
+        /* 数据列表样式 */
+        .data-list {
+            max-height: 260px;
+            overflow: auto; /* 同时支持横向与纵向滚动 */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+        .data-table {
+            border-collapse: collapse;
+            width: max-content; /* 根据内容撑开，允许横向滚动 */
+            min-width: 100%;
+            table-layout: auto;
+        }
+        .data-table thead th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+            padding: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            text-align: left;
+        }
+        .data-table tbody td {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 6px 8px;
+            font-size: 12px;
+            color: #333;
+            white-space: nowrap;
+            max-width: 240px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .data-table tbody tr {
+            cursor: pointer;
+        }
+        .data-table tbody tr:hover {
+            background: #f5faff;
+        }
+        .data-table tbody tr.active {
+            background: #e6f4ff;
+            color: #1677ff;
+            font-weight: 600;
+        }
+        
+        /* 数据集管理（列表式） */
+        .dataset-actions { display: flex; gap: 8px; margin-bottom: 8px; }
+        .dataset-actions .dataset-btn { height: 28px; border: none; border-radius: 4px; padding: 0 10px; cursor: pointer; font-size: 12px; }
+        #addDatasetBtn { background: #1677ff; color: #fff; }
+        #renderAllBtn { background: #4ecdc4; color: #fff; }
+        .dataset-list { border: 1px solid #ddd; border-radius: 4px; background: #fff; max-height: 220px; overflow-y: auto; }
+        .dataset-row { display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 8px; padding: 6px 8px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+        .dataset-row:last-child { border-bottom: none; }
+        .dataset-row:hover { background: #f5faff; }
+        .dataset-row.active { background: #e6f4ff; }
+        .dataset-name { font-size: 12px; color: #333; }
+        .dataset-row .small-btn { height: 24px; border: none; border-radius: 4px; padding: 0 8px; cursor: pointer; font-size: 12px; }
+        .small-btn.fit { background: #52c41a; color: #fff; }
+        .small-btn.render { background: #1677ff; color: #fff; }
+        .small-btn.delete { background: #ff7875; color: #fff; }
+        .small-btn.toggle { background: #faad14; color: #fff; }
+        .dataset-name-input { width: 100%; height: 26px; border: 1px solid #ddd; border-radius: 4px; padding: 0 8px; font-size: 12px; box-sizing: border-box; }
+        
+        /* 数据集管理 */
+        .dataset-manager {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .dataset-select {
+            flex: 1;
+            height: 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0 8px;
+            font-size: 12px;
+            background: #fff;
+        }
+        .dataset-btn {
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            padding: 0 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .dataset-add-btn { background: #1677ff; color: #fff; }
+        .dataset-del-btn { background: #ff7875; color: #fff; }
+        .dataset-fit-btn { background: #52c41a; color: #fff; }
+    </style>
+    <title>GIS数据可视化工具</title>
+    <script src="https://api.map.baidu.com/api?v=3.0&type=webgl&ak=Kqxw3hKvBtjG8ssUpWO65wrk2Hq4YFds"></script>
+    <script src="https://mapv.baidu.com/build/mapv.min.js"></script>
+    <script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.189/dist/mapvgl.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="layer-control">
+                <div>
+                    <span class="layer-icon data-layer-icon"></span>
+                    <label><input type="checkbox" id="data-layer-toggle" checked> 数据图层</label>
+                </div>
+                <div>
+                    <span class="layer-icon label-layer-icon"></span>
+                    <label><input type="checkbox" id="label-layer-toggle" checked> 标签图层</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <div class="control-section">
+                <h3>数据集管理</h3>
+                <div class="dataset-actions">
+                    <button id="addDatasetBtn" class="dataset-btn">新增</button>
+                    <button id="renderAllBtn" class="dataset-btn">全部渲染</button>
+                </div>
+                <div id="datasetList" class="dataset-list">
+                    <div style="padding: 10px; color: #666; font-size: 12px;">暂无数据集，请先新增或解析</div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>JSON数据输入</h3>
+                <textarea id="jsonInput" class="json-input" placeholder="请输入JSON格式的数据数组..."></textarea>
+                <button id="parseBtn" class="parse-btn">解析数据</button>
+                <div id="statusMessage" class="status-message" style="display: none;"></div>
+            </div>
+            
+            <div class="control-section">
+                <h3>属性配置</h3>
+                <div id="propertyList" class="property-list" style="display: none;">
+                    <!-- 属性列表将在这里动态生成 -->
+                </div>
+                <div class="action-buttons-title">操作按钮</div>
+                <div class="action-buttons">
+                    <button id="clearBtn" class="action-btn clear-btn">清除数据</button>
+                    <button id="renderBtn" class="action-btn render-btn">渲染地图</button>
+                </div>
+            </div>
+            <div class="control-section">
+                <h3>数据列表</h3>
+                <div id="dataList" class="data-list">
+                    <div style="padding: 10px; color: #666; font-size: 12px;">渲染后可用</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let map;
+        // 数据集结构 { id, name, color, visible, rawText, data, properties, wktField, labelFields, polygons, labels }
+        let datasets = [];
+        let activeDatasetIndex = -1;
+        
+        // 当前数据集便捷引用（通过getter函数获取）
+        function currentDataset() { return datasets[activeDatasetIndex] || null; }
+        
+        // 初始化地图
+        function initMap() {
+            map = new BMapGL.Map('map');
+            const point = new BMapGL.Point(116.404, 39.915);
+            map.centerAndZoom(point, 12);
+            map.enableScrollWheelZoom(true);
+        }
+        
+        // 显示状态消息
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // 检查是否为WKT格式
+        function isWktFormat(value) {
+            if (typeof value !== 'string') return false;
+            
+            // 检查常见的WKT格式
+            const wktPatterns = [
+                /^POINT\s*\(\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s*\)$/i,
+                /^LINESTRING\s*\((?:-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s*,?\s*)+\)$/i,
+                /^POLYGON\s*\(\((?:-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s*,?\s*)+\)\)$/i,
+                /^MULTIPOINT\s*\((?:-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s*,?\s*)+\)$/i,
+                /^MULTILINESTRING\s*\(\((?:-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s*,?\s*)+\)\)$/i,
+                /^MULTIPOLYGON\s*\(\(\((?:-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s*,?\s*)+\)\)\)$/i
+            ];
+
+            
+            return wktPatterns.some(pattern => pattern.test(value.trim()));
+        }
+        
+        // 解析WKT为坐标数组
+        function parseWkt(wkt) {
+            try {
+                // 简单的WKT解析，主要处理POLYGON
+                const polygonMatch = wkt.match(/POLYGON\s*\(\(([^)]+)\)\)/i);
+                if (polygonMatch) {
+                    const coordsStr = polygonMatch[1];
+                    const coordPairs = coordsStr.split(',').map(pair => {
+                        const [lng, lat] = pair.trim().split(/\s+/);
+                        return [parseFloat(lng), parseFloat(lat)];
+                    });
+                    return [coordPairs]; // 返回多边形坐标数组
+                }
+                
+                // 处理POINT
+                const pointMatch = wkt.match(/POINT\s*\(([^)]+)\)/i);
+                if (pointMatch) {
+                    const [lng, lat] = pointMatch[1].trim().split(/\s+/);
+                    return [[parseFloat(lng), parseFloat(lat)]];
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('WKT解析错误:', error);
+                return null;
+            }
+        }
+        
+        // 解析JSON数据
+        function parseJsonData() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            
+            if (!jsonInput) {
+                showStatus('请输入JSON数据', 'error');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(jsonInput);
+                
+                if (!Array.isArray(data) || data.length === 0) {
+                    showStatus('请输入非空的数据数组', 'error');
+                    return;
+                }
+                
+                // 更新当前数据集（不新增）
+                let ds = currentDataset();
+                if (!ds) {
+                    ds = { id: Date.now(), name: `数据集 1`, color: randomColor(), visible: true, rawText: '', data: [], properties: [], wktField: '', labelFields: [], polygons: [], labels: [] };
+                    datasets.push(ds);
+                    activeDatasetIndex = 0;
+                }
+                ds.rawText = jsonInput;
+                ds.data = data;
+                ds.properties = Object.keys(data[0]);
+                // 自动猜测WKT字段：总是以当前数据为准
+                const guesses = ds.properties.filter(p => isWktFormat(ds.data[0][p]));
+                ds.wktField = guesses.length ? guesses[0] : '';
+                const wktMsg = ds.wktField ? `已识别WKT字段：${ds.wktField}` : '未识别到WKT字段';
+                showStatus(`成功解析 ${data.length} 条数据，发现 ${ds.properties.length} 个属性。${wktMsg}`, ds.wktField ? 'success' : 'info');
+                renderDatasetList();
+                onDatasetChanged();
+                
+                showStatus(`成功解析 ${data.length} 条数据，发现 ${ds.properties.length} 个属性`, 'success');
+                
+                renderPropertyList();
+                
+            } catch (error) {
+                showStatus('JSON格式错误: ' + error.message, 'error');
+            }
+        }
+        
+        // 渲染属性列表
+        function renderPropertyList() {
+            const ds = currentDataset();
+            if (!ds) return;
+            const propertyList = document.getElementById('propertyList');
+            propertyList.innerHTML = '';
+            
+            // 添加标题行
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'property-header';
+            headerDiv.innerHTML = `
+                <div class="property-name">属性名</div>
+                <div class="property-value">属性值</div>
+                <div class="property-controls">
+                    <span style="font-size: 11px; color: #666;">WKT</span>
+                    <span style="font-size: 11px; color: #666; margin-left: 15px;">标签</span>
+                </div>
+            `;
+            propertyList.appendChild(headerDiv);
+            
+            ds.properties.forEach((prop, index) => {
+                const value = ds.data[0][prop];
+                const isWkt = isWktFormat(value);
+                const displayValue = String(value).substring(0, 50) + (String(value).length > 50 ? '...' : '');
+                
+                const propertyItem = document.createElement('div');
+                propertyItem.className = 'property-item';
+                
+                propertyItem.innerHTML = `
+                    <div class="property-name">
+                        ${prop}
+                        ${isWkt ? '<span class="wkt-badge">WKT</span>' : ''}
+                    </div>
+                    <div class="property-value" data-full-value="${String(value).replace(/"/g, '&quot;')}">${displayValue}</div>
+                    <div class="property-controls">
+                        <input type="radio" name="wktField" value="${prop}" class="wkt-radio" ${isWkt || ds.wktField === prop ? 'checked' : ''}>
+                        <input type="checkbox" class="label-checkbox" value="${prop}" ${ds.labelFields.includes(prop) ? 'checked' : ''}>
+                    </div>
+                `;
+                
+                propertyList.appendChild(propertyItem);
+            });
+            
+            propertyList.style.display = 'block';
+            
+            // 自动选择WKT字段
+            const wktFields = ds.properties.filter(prop => isWktFormat(ds.data[0][prop]));
+            if (wktFields.length > 0) {
+                // 如果当前未设置或不在候选中，则取第一个候选
+                if (!ds.wktField || !wktFields.includes(ds.wktField)) ds.wktField = wktFields[0];
+                const radio = propertyList.querySelector(`input[name="wktField"][value="${ds.wktField}"]`);
+                if (radio) radio.checked = true;
+            }
+            
+            // 绑定事件
+            bindPropertyEvents();
+        }
+        
+        // 绑定属性列表事件
+        function bindPropertyEvents() {
+            // WKT字段选择
+            propertyList.querySelectorAll('.wkt-radio').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const cds = currentDataset();
+                    if (!cds) return;
+                    cds.wktField = this.value;
+                });
+            });
+            
+            // 标签字段选择
+            propertyList.querySelectorAll('.label-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const cds = currentDataset();
+                    if (!cds) return;
+                    if (this.checked) cds.labelFields.push(this.value);
+                    else cds.labelFields = cds.labelFields.filter(field => field !== this.value);
+                });
+            });
+        }
+        
+        // 清除数据
+        function clearData() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('propertyList').style.display = 'none';
+            document.getElementById('statusMessage').style.display = 'none';
+            
+            // 清除地图上的覆盖物
+            clearMapOverlays();
+            
+            parsedData = [];
+            properties = [];
+            selectedWktField = '';
+            selectedLabelFields = [];
+            
+            showStatus('数据已清除', 'info');
+        }
+        
+        // 清除地图覆盖物
+        function clearMapOverlays() {
+            datasets.forEach(ds => {
+                (ds.polygons || []).forEach(polygon => map.removeOverlay(polygon));
+                (ds.labels || []).forEach(label => map.removeOverlay(label));
+                ds.polygons = [];
+                ds.labels = [];
+            });
+        }
+        
+        // 渲染地图
+        function renderMap() {
+            const ds = currentDataset();
+            if (!ds) {
+                showStatus('请先解析一个数据集', 'error');
+                return;
+            }
+            if (!ds.wktField) {
+                showStatus('请选择WKT字段', 'error');
+                return;
+            }
+            
+            // 不清空其他数据集，只清理当前数据集
+            (ds.polygons||[]).forEach(p=>map.removeOverlay(p));
+            (ds.labels||[]).forEach(l=>map.removeOverlay(l));
+            
+            let validDataCount = 0;
+            let errorCount = 0;
+            let allPoints = [];
+            
+            ds.polygons = [];
+            ds.labels = [];
+            
+            ds.data.forEach((item, index) => {
+                const wktValue = item[ds.wktField];
+                
+                if (!wktValue) {
+                    errorCount++;
+                    return;
+                }
+                
+                const coordinates = parseWkt(wktValue);
+                
+                if (!coordinates) {
+                    errorCount++;
+                    return;
+                }
+                
+                // 创建多边形
+                const pointArr = coordinates[0].map(coord => new BMapGL.Point(coord[0], coord[1]));
+                const polygon = new BMapGL.Polygon(pointArr, {
+                    fillColor: ds.color || '#4287f5',
+                    strokeOpacity: 1,
+                    fillOpacity: 0.5,
+                    strokeColor: darkenColor(ds.color || '#4287f5'),
+                    strokeWeight: 2
+                });
+                
+                // 添加事件监听
+                polygon.addEventListener('click', function() {
+                    focusOnPolygon(index, true);
+                });
+                
+                map.addOverlay(polygon);
+                ds.polygons.push(polygon);
+                
+                // 收集所有点用于计算边界
+                allPoints = allPoints.concat(pointArr);
+
+                // 计算几何属性：面积（m²）、点数
+                try {
+                    const area = calculatePolygonArea(pointArr);
+                    const pointCount = pointArr.length;
+                    // 存回原始数据上用于表格展示
+                    item.__geom_area = Number.isFinite(area) ? Math.round(area) : '';
+                    item.__geom_points = pointCount;
+                } catch (e) {
+                    item.__geom_area = '';
+                    item.__geom_points = pointArr.length;
+                }
+                
+                // 创建标签
+                if (ds.labelFields.length > 0) {
+                    const centerPoint = calculateCenter(coordinates[0]);
+                    const labelText = ds.labelFields.map(field => item[field]).join(' - ');
+                    
+                    const label = new BMapGL.Label(labelText, {
+                        position: new BMapGL.Point(centerPoint[0], centerPoint[1]),
+                        offset: new BMapGL.Size(0, 0)
+                    });
+                    
+                    label.setStyle({
+                        color: '#333',
+                        backgroundColor: 'rgba(255,255,255,0.8)',
+                        border: '1px solid #ccc',
+                        borderRadius: '3px',
+                        padding: '2px 6px',
+                        fontSize: '12px',
+                        whiteSpace: 'nowrap'
+                    });
+                    
+                    map.addOverlay(label);
+                    ds.labels.push(label);
+                }
+                
+                validDataCount++;
+            });
+            
+            // 自动调整地图视野到所有几何数据的位置
+            if (validDataCount > 0 && allPoints.length > 0) {
+                map.setViewport(allPoints);
+            }
+            
+            // 渲染数据列表
+            renderDataList();
+            
+            showStatus(`数据集“${ds.name}”渲染成功：${validDataCount} 个要素${errorCount > 0 ? `，${errorCount} 个解析失败` : ''}`, 'success');
+        }
+        
+        // 计算多边形中心点
+        function calculateCenter(coordinates) {
+            let centerX = 0, centerY = 0;
+            coordinates.forEach(coord => {
+                centerX += coord[0];
+                centerY += coord[1];
+            });
+            return [centerX / coordinates.length, centerY / coordinates.length];
+        }
+        
+        // 计算地理多边形面积（平方米）- 使用球面近似算法
+        // 输入：BMapGL.Point[]（经纬度）
+        // 参考：经纬度到弧度转换 + 球面多边形面积公式
+        function calculatePolygonArea(points) {
+            if (!points || points.length < 3) return 0;
+            const R = 6378137; // WGS84 地球半径（米）
+            const rad = deg => deg * Math.PI / 180;
+            let area = 0;
+            for (let i = 0, len = points.length; i < len; i++) {
+                const p1 = points[i];
+                const p2 = points[(i + 1) % len];
+                const lon1 = rad(p1.lng), lat1 = rad(p1.lat);
+                const lon2 = rad(p2.lng), lat2 = rad(p2.lat);
+                area += (lon2 - lon1) * (2 + Math.sin(lat1) + Math.sin(lat2));
+            }
+            area = area * R * R / 2.0;
+            return Math.abs(area);
+        }
+        
+        // 通过多边形路径获取中心点
+        function getPolygonCenterFromPath(points) {
+            if (!points || points.length === 0) {
+                return null;
+            }
+            let sumLng = 0;
+            let sumLat = 0;
+            points.forEach(p => {
+                sumLng += p.lng;
+                sumLat += p.lat;
+            });
+            return new BMapGL.Point(sumLng / points.length, sumLat / points.length);
+        }
+        
+        // 高亮与定位
+        let highlightedPolygon = null;
+        const defaultPolygonStyle = {
+            fillColor: '#4287f5',
+            strokeColor: '#1a53ff',
+            strokeWeight: 2,
+            fillOpacity: 0.5
+        };
+        
+        function focusOnPolygon(index, openInfo = false) {
+            const ds = currentDataset();
+            if (!ds) return;
+            const polygon = ds.polygons[index];
+            if (!polygon) return;
+            
+            // 重置上一个高亮
+            if (highlightedPolygon) {
+                highlightedPolygon.setFillColor(defaultPolygonStyle.fillColor);
+                highlightedPolygon.setStrokeColor(defaultPolygonStyle.strokeColor);
+                highlightedPolygon.setStrokeWeight(defaultPolygonStyle.strokeWeight);
+                highlightedPolygon.setFillOpacity(defaultPolygonStyle.fillOpacity);
+            }
+            
+            // 高亮当前
+            polygon.setStrokeColor('#ff8800');
+            polygon.setFillColor('#ffa940');
+            polygon.setStrokeWeight(3);
+            polygon.setFillOpacity(0.6);
+            highlightedPolygon = polygon;
+            
+            // 视野定位到该多边形
+            const path = polygon.getPath();
+            if (path && path.length > 0) {
+                map.setViewport(path);
+            }
+            
+            // 打开信息窗
+            if (openInfo) {
+                const centerPoint = getPolygonCenterFromPath(path);
+                const item = ds.data[index];
+                if (centerPoint && item) {
+                    showItemInfoPopup(item, centerPoint);
+                }
+            }
+            
+            // 同步数据列表选中状态（仅当前数据集的数据表）
+            const container = document.getElementById('dataList');
+            if (container) {
+                const rows = container.querySelectorAll('.data-table tbody tr');
+                rows.forEach(el => el.classList.remove('active'));
+                if (rows[index]) rows[index].classList.add('active');
+            }
+        }
+        
+        function getItemLabel(item, index) {
+            if (selectedLabelFields && selectedLabelFields.length > 0) {
+                const ds = currentDataset();
+                const label = (ds?.labelFields || []).map(field => item[field]).filter(Boolean).join(' - ');
+                if (label && label.trim().length > 0) return label;
+            }
+            if (item.name) return String(item.name);
+            if (item.id !== undefined) return `#${item.id}`;
+            return `要素 ${index + 1}`;
+        }
+        
+        function renderDataList() {
+            const container = document.getElementById('dataList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const ds = currentDataset();
+            if (!ds || !ds.data || ds.data.length === 0) {
+                container.innerHTML = '<div style="padding: 10px; color: #666; font-size: 12px;">暂无数据</div>';
+                return;
+            }
+
+            // 确定表头（包含计算列）
+            const columns = [...ds.properties];
+            if (!columns.includes('面积_m2')) columns.push('面积_m2');
+            if (!columns.includes('点数')) columns.push('点数');
+
+            // 构建表格
+            const table = document.createElement('table');
+            table.className = 'data-table';
+
+            const thead = document.createElement('thead');
+            const headTr = document.createElement('tr');
+            // 颜色提示列
+            const colorTh = document.createElement('th');
+            colorTh.textContent = '';
+            headTr.appendChild(colorTh);
+            columns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                headTr.appendChild(th);
+            });
+            thead.appendChild(headTr);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            ds.data.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.addEventListener('click', () => {
+                    focusOnPolygon(idx, true);
+                });
+
+                const colorCell = document.createElement('td');
+                colorCell.innerHTML = `<span class="color-dot" style="display:inline-block; vertical-align:middle; background:${ds.color || '#4287f5'}"></span>`;
+                tr.appendChild(colorCell);
+
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    let value;
+                    if (col === '面积_m2') {
+                        value = item.__geom_area !== undefined ? item.__geom_area : '';
+                    } else if (col === '点数') {
+                        value = item.__geom_points !== undefined ? item.__geom_points : '';
+                    } else {
+                        value = item[col];
+                    }
+                    td.title = value !== undefined ? String(value) : '';
+                    td.textContent = value !== undefined ? String(value) : '';
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+
+            container.appendChild(table);
+        }
+        
+        // 显示要素信息弹窗
+        function showItemInfoPopup(item, point) {
+            // 关闭之前的弹窗
+            if (window.currentInfoWindow) {
+                map.closeInfoWindow(window.currentInfoWindow);
+            }
+            
+            // 创建弹窗内容
+            let content = '<div style="padding: 10px; max-width: 300px;">';
+            content += '<div style="font-weight: bold; margin-bottom: 10px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;">要素信息</div>';
+            
+            Object.keys(item).forEach(key => {
+                const value = item[key];
+                let displayValue = value;
+                
+                // 如果是WKT格式，截断显示
+                if (typeof value === 'string' && isWktFormat(value)) {
+                    displayValue = value.length > 50 ? value.substring(0, 50) + '...' : value;
+                }
+                
+                content += `<div style="margin-bottom: 8px;">`;
+                content += `<span style="font-weight: 600; color: #555; font-size: 12px;">${key}:</span> `;
+                content += `<span style="color: #333; font-size: 12px; word-break: break-all;">${displayValue}</span>`;
+                content += `</div>`;
+            });
+            
+            content += '</div>';
+            
+            // 创建信息窗口
+            const infoWindow = new BMapGL.InfoWindow(content, {
+                width: 320,
+                height: 'auto',
+                title: '',
+                enableCloseOnClick: true,
+                enableAutoPan: true
+            });
+            
+            // 在点击位置显示弹窗
+            map.openInfoWindow(infoWindow, point);
+            
+            // 保存当前弹窗引用
+            window.currentInfoWindow = infoWindow;
+        }
+        
+        // 数据集下拉与按钮
+        function onDatasetChanged() {
+            const ds = currentDataset();
+            if (!ds) return;
+            document.getElementById('jsonInput').value = ds.rawText || '';
+            renderPropertyList();
+            renderDataList();
+        }
+        
+        function renderDatasetList() {
+            const list = document.getElementById('datasetList');
+            if (!list) return;
+            list.innerHTML = '';
+            if (datasets.length === 0) {
+                list.innerHTML = '<div style="padding: 10px; color: #666; font-size: 12px;">暂无数据集，请先新增或解析</div>';
+                return;
+            }
+            datasets.forEach((ds, idx) => {
+                const row = document.createElement('div');
+                row.className = 'dataset-row' + (idx === activeDatasetIndex ? ' active' : '');
+                row.addEventListener('click', () => {
+                    activeDatasetIndex = idx;
+                    onDatasetChanged();
+                    renderDatasetList();
+                });
+
+                // 名称可编辑
+                const nameInput = document.createElement('input');
+                nameInput.className = 'dataset-name-input';
+                nameInput.value = ds.name || `数据集 ${idx+1}`;
+                nameInput.addEventListener('click', e => e.stopPropagation());
+                nameInput.addEventListener('change', () => { ds.name = nameInput.value || ds.name; });
+
+                // 颜色选择器
+                const color = document.createElement('input');
+                color.type = 'color';
+                color.value = ds.color || '#4287f5';
+                color.addEventListener('click', e => e.stopPropagation());
+                color.addEventListener('change', () => {
+                    ds.color = color.value;
+                    (ds.polygons||[]).forEach(p => { p.setFillColor(ds.color); p.setStrokeColor(darkenColor(ds.color)); });
+                });
+
+                // 显隐按钮
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'small-btn toggle';
+                const updateToggleText = () => { toggleBtn.textContent = ds.visible === false ? '显示' : '隐藏'; };
+                updateToggleText();
+                toggleBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    ds.visible = ds.visible === false ? true : false;
+                    updateToggleText();
+                    (ds.polygons||[]).forEach(p => ds.visible ? p.show() : p.hide());
+                    (ds.labels||[]).forEach(l => ds.visible ? l.show() : l.hide());
+                });
+
+                const fitBtn = document.createElement('button');
+                fitBtn.textContent = '适配';
+                fitBtn.className = 'small-btn fit';
+                fitBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    fitDatasetBounds(idx);
+                });
+
+                const renderBtn = document.createElement('button');
+                renderBtn.textContent = '渲染';
+                renderBtn.className = 'small-btn render';
+                renderBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    activeDatasetIndex = idx;
+                    renderMap();
+                    renderDatasetList();
+                });
+
+                const delBtn = document.createElement('button');
+                delBtn.textContent = '删除';
+                delBtn.className = 'small-btn delete';
+                delBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    (ds.polygons||[]).forEach(p=>map.removeOverlay(p));
+                    (ds.labels||[]).forEach(l=>map.removeOverlay(l));
+                    datasets.splice(idx,1);
+                    if (activeDatasetIndex >= datasets.length) activeDatasetIndex = datasets.length - 1;
+                    renderDatasetList();
+                    onDatasetChanged();
+                });
+
+                row.appendChild(nameInput);
+                row.appendChild(color);
+                row.appendChild(toggleBtn);
+                row.appendChild(fitBtn);
+                row.appendChild(renderBtn);
+                row.appendChild(delBtn);
+                list.appendChild(row);
+            });
+        }
+        
+        function fitDatasetBounds(idx) {
+            const ds = datasets[idx];
+            if (!ds || !ds.polygons || ds.polygons.length === 0) return;
+            const pts = [];
+            ds.polygons.forEach(poly => pts.push(...poly.getPath()));
+            if (pts.length) map.setViewport(pts);
+        }
+        
+        function bindDatasetControls() {
+            document.getElementById('addDatasetBtn').addEventListener('click', () => {
+                const index = datasets.length + 1;
+                const ds = { id: Date.now(), name: `数据集 ${index}` , color: randomColor(), visible: true, rawText: '', data: [], properties: [], wktField: '', labelFields: [], polygons: [], labels: [] };
+                datasets.push(ds);
+                activeDatasetIndex = datasets.length - 1;
+                renderDatasetList();
+                onDatasetChanged();
+            });
+            document.getElementById('renderAllBtn').addEventListener('click', () => {
+                // 渲染所有数据集（保持各自颜色）
+                datasets.forEach((_, i) => { activeDatasetIndex = i; renderMap(); });
+                renderDatasetList();
+            });
+        }
+
+        // 图层控制
+        function initLayerControls() {
+            document.getElementById('data-layer-toggle').addEventListener('change', function() {
+                const ds = currentDataset();
+                if (!ds) return;
+                (ds.polygons||[]).forEach(polygon => {
+                    if (this.checked) {
+                        polygon.show();
+                    } else {
+                        polygon.hide();
+                    }
+                });
+            });
+            
+            document.getElementById('label-layer-toggle').addEventListener('change', function() {
+                const ds = currentDataset();
+                if (!ds) return;
+                (ds.labels||[]).forEach(label => {
+                    if (this.checked) {
+                        label.show();
+                    } else {
+                        label.hide();
+                    }
+                });
+            });
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            initLayerControls();
+            bindDatasetControls();
+            
+            // 绑定按钮事件
+            document.getElementById('parseBtn').addEventListener('click', parseJsonData);
+            document.getElementById('clearBtn').addEventListener('click', clearData);
+            document.getElementById('renderBtn').addEventListener('click', renderMap);
+            
+            // 示例数据
+            const exampleData = [
+                {
+                    "id": 1,
+                    "name": "测试区域1",
+                    "geometry": "POLYGON((116.404 39.915, 116.414 39.915, 116.414 39.925, 116.404 39.925, 116.404 39.915))",
+                    "type": "商业区",
+                    "area": 1000
+                },
+                {
+                    "id": 2,
+                    "name": "测试区域2", 
+                    "geometry": "POLYGON((116.424 39.905, 116.434 39.905, 116.434 39.915, 116.424 39.915, 116.424 39.905))",
+                    "type": "住宅区",
+                    "area": 2000
+                }
+            ];
+            
+            // 初始化首个数据集
+            const initText = JSON.stringify(exampleData, null, 2);
+            const ds0 = { id: Date.now(), name: '数据集 1', color: randomColor(), visible: true, rawText: initText, data: exampleData, properties: Object.keys(exampleData[0]), wktField: 'geometry', labelFields: ['name'], polygons: [], labels: [] };
+            datasets.push(ds0);
+            activeDatasetIndex = 0;
+            renderDatasetList();
+            onDatasetChanged();
+
+            // 输入框自动解析（debounce）
+            const input = document.getElementById('jsonInput');
+            let timer = null;
+            input.addEventListener('input', () => {
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(() => {
+                    tryAutoParseFromInput();
+                }, 400);
+            });
+        });
+
+        function tryAutoParseFromInput() {
+            const text = document.getElementById('jsonInput').value.trim();
+            if (!text) return;
+            try {
+                const arr = JSON.parse(text);
+                if (Array.isArray(arr) && arr.length > 0 && typeof arr[0] === 'object') {
+                    let ds = currentDataset();
+                    if (!ds) {
+                        ds = { id: Date.now(), name: `数据集 1`, color: randomColor(), visible: true, rawText: '', data: [], properties: [], wktField: '', labelFields: [], polygons: [], labels: [] };
+                        datasets.push(ds);
+                        activeDatasetIndex = 0;
+                    }
+                    ds.rawText = text;
+                    ds.data = arr;
+                    ds.properties = Object.keys(arr[0]);
+                    // 自动识别WKT字段（总是根据当前数据进行）
+                    const guesses = ds.properties.filter(p => isWktFormat(arr[0][p]));
+                    ds.wktField = guesses.length ? guesses[0] : '';
+                    const wktMsg = ds.wktField ? `已识别WKT字段：${ds.wktField}` : '未识别到WKT字段';
+                    showStatus(`成功解析 ${arr.length} 条数据，发现 ${ds.properties.length} 个属性。${wktMsg}`, ds.wktField ? 'success' : 'info');
+                    renderDatasetList();
+                    onDatasetChanged();
+                }
+            } catch (e) {
+                // ignore parse error while typing
+            }
+        }
+
+        // 工具：随机颜色与加深颜色
+        function randomColor() {
+            const hue = Math.floor(Math.random() * 360);
+            return hslToHex(hue, 70, 55);
+        }
+        function hslToHex(h, s, l) {
+            s /= 100; l /= 100;
+            const k = n => (n + h / 30) % 12;
+            const a = s * Math.min(l, 1 - l);
+            const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            const toHex = x => Math.round(x * 255).toString(16).padStart(2, '0');
+            return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+        }
+        function darkenColor(hex, amount = 20) {
+            if (!hex) return '#333333';
+            const c = hex.replace('#','');
+            const num = parseInt(c, 16);
+            let r = (num >> 16) & 0xff;
+            let g = (num >> 8) & 0xff;
+            let b = num & 0xff;
+            r = Math.max(0, r - amount);
+            g = Math.max(0, g - amount);
+            b = Math.max(0, b - amount);
+            const toHex = v => v.toString(16).padStart(2, '0');
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+    </script>
+<script src="assets/js/layout.js"></script>
+</body>
+</html> 

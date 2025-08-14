@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>页面未找到 · GIS Map UTools</title>
+  <link rel="stylesheet" href="assets/css/styles.css"/>
+  <!-- 使用 JS 计算仓库根路径跳转，避免项目页 404 回到用户页根目录的问题 -->
+  <style>
+    .not-found{display:flex;align-items:center;justify-content:center;min-height:70vh;text-align:center}
+    .not-found .box{max-width:680px;padding:24px}
+    .not-found h1{margin:0 0 12px}
+    .not-found p{margin:6px 0;color:#9aa4b2}
+    .not-found a{color:#3b82f6;text-decoration:none}
+  </style>
+  <script>
+    (function(){
+      // GitHub Pages 项目页的仓库根路径推断：/<repo>/
+      function repoBase(){
+        var seg = location.pathname.split('/').filter(Boolean);
+        if(seg.length>0){ return '/'+seg[0]+'/'; }
+        return '/';
+      }
+      // 6 秒后跳回仓库根目录
+      setTimeout(function(){ location.href = repoBase(); }, 6000);
+    })();
+  </script>
+</head>
+<body>
+  <div class="not-found">
+    <div class="box">
+      <h1>404 未找到</h1>
+      <p>抱歉，您访问的页面不存在或已移动。</p>
+      <p><a href="./">返回首页</a> · 6 秒后自动跳转</p>
+    </div>
+  </div>
+</body>
+</html>
+
+
