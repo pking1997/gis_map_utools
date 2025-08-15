@@ -8,6 +8,21 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg"/>
   <link rel="stylesheet" href="assets/css/styles.css"/>
   <meta name="color-scheme" content="light dark"/>
+  <style>
+    .nav-section{margin-top:40px}
+    .nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:16px}
+    .nav-card{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;padding:16px;text-decoration:none;color:var(--text);background:linear-gradient(180deg,#0e121a,#0b0d12);transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease}
+    .nav-card:hover{transform:translateY(-2px);border-color:#2a3757;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    .nav-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .nav-card-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .nav-card-title{margin:0;font-size:16px;font-weight:600}
+    .nav-card-desc{margin:0;color:var(--muted);line-height:1.5;font-size:14px}
+    .nav-card-meta{display:flex;gap:8px;margin-top:12px}
+    .nav-card .badge{font-size:11px;padding:2px 6px}
+    @media (prefers-color-scheme: light){
+      .nav-card{background:linear-gradient(180deg,#fff,#f9fafb)}
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -32,6 +47,28 @@
     </section>
 
     <section class="tool-grid" id="tool-grid" aria-live="polite">
+      <a class="tool-card" href="coordConverterEnhanced.html" data-tags="坐标 转换 wgs84 gcj02 bd09 经纬度 coordinate 增强">
+        <div class="tool-card-body">
+          <h2 class="tool-title">坐标系转换（增强版）</h2>
+          <p class="tool-desc">支持 WKT、GeoJSON 格式的批量坐标系转换，BD-09、GCJ-02、WGS84 互转。</p>
+        </div>
+        <div class="tool-card-meta">
+          <span class="badge">坐标</span>
+          <span class="badge">增强</span>
+        </div>
+      </a>
+
+      <a class="tool-card" href="fenceConverter.html" data-tags="围栏 数据 转换 lnglat wkt geojson fence">
+        <div class="tool-card-body">
+          <h2 class="tool-title">围栏数据转换</h2>
+          <p class="tool-desc">lnglat 对象数组、WKT、GeoJSON 之间的格式转换，快速处理围栏数据。</p>
+        </div>
+        <div class="tool-card-meta">
+          <span class="badge">数据</span>
+          <span class="badge">转换</span>
+        </div>
+      </a>
+
       <a class="tool-card" href="coordConverter.html" data-tags="坐标 转换 wgs84 gcj02 bd09 经纬度 coordinate">
         <div class="tool-card-body">
           <h2 class="tool-title">坐标系转换</h2>
@@ -57,11 +94,169 @@
       <div class="tool-card tool-card--disabled" aria-disabled="true">
         <div class="tool-card-body">
           <h2 class="tool-title">更多工具 · 敬请期待</h2>
-          <p class="tool-desc">后续将持续添加坐标转换、WKT/GeoJSON 工具、瓦片编号、量算等。</p>
+          <p class="tool-desc">后续将持续添加瓦片编号、量算工具、坐标拾取器等实用功能。</p>
         </div>
         <div class="tool-card-meta">
           <span class="badge">规划</span>
         </div>
+      </div>
+    </section>
+
+    <section class="nav-section">
+      <h2>优质资源</h2>
+      <p class="muted">收集了一些优秀的 GIS 相关网站和资源，方便快速访问。</p>
+      
+      <div class="nav-grid">
+        <a class="nav-card" href="https://www.osgeo.cn/" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#059669">🏛️</div>
+            <h3 class="nav-card-title">OSGeo中国中心</h3>
+          </div>
+          <p class="nav-card-desc">开源地理空间基金会中文分会，提供开源GIS文档、教程和资源。</p>
+          <div class="nav-card-meta">
+            <span class="badge">开源GIS</span>
+            <span class="badge">中文资源</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://epsg.io/" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#059669">🌍</div>
+            <h3 class="nav-card-title">EPSG.io</h3>
+          </div>
+          <p class="nav-card-desc">坐标系数据库，查询 EPSG 代码和坐标系参数。</p>
+          <div class="nav-card-meta">
+            <span class="badge">坐标系</span>
+            <span class="badge">数据库</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#7c3aed">🌐</div>
+            <h3 class="nav-card-title">OpenStreetMap</h3>
+          </div>
+          <p class="nav-card-desc">开源地图数据平台，免费的地图数据源。</p>
+          <div class="nav-card-meta">
+            <span class="badge">地图数据</span>
+            <span class="badge">开源</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#059669">🍃</div>
+            <h3 class="nav-card-title">Leaflet</h3>
+          </div>
+          <p class="nav-card-desc">轻量级开源地图库，适合 Web 地图开发。</p>
+          <div class="nav-card-meta">
+            <span class="badge">地图库</span>
+            <span class="badge">JavaScript</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://qgis.org/" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#dc2626">🖥️</div>
+            <h3 class="nav-card-title">QGIS</h3>
+          </div>
+          <p class="nav-card-desc">开源桌面 GIS 软件，功能强大的地理信息处理工具。</p>
+          <div class="nav-card-meta">
+            <span class="badge">桌面软件</span>
+            <span class="badge">开源</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="nav-section">
+      <h2>实用工具</h2>
+      <p class="muted">收集了一些实用的 GIS 在线工具，方便快速使用。</p>
+      
+      <div class="nav-grid">
+        <a class="nav-card" href="https://lbs.baidu.com/maptool/getpoint" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#3b82f6">📍</div>
+            <h3 class="nav-card-title">百度地图拾点</h3>
+          </div>
+          <p class="nav-card-desc">百度地图坐标拾取工具，快速获取地理坐标信息。</p>
+          <div class="nav-card-meta">
+            <span class="badge">坐标拾取</span>
+            <span class="badge">百度地图</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://lbs.amap.com/tools/picker" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#059669">📍</div>
+            <h3 class="nav-card-title">高德地图拾点</h3>
+          </div>
+          <p class="nav-card-desc">高德地图坐标拾取工具，支持多种坐标系转换。</p>
+          <div class="nav-card-meta">
+            <span class="badge">坐标拾取</span>
+            <span class="badge">高德地图</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://lbsdoc.zto.com/mapTools/geojsonEditor" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#dc2626">📝</div>
+            <h3 class="nav-card-title">GeoJSON编辑器-中通地图</h3>
+          </div>
+          <p class="nav-card-desc">中通地图提供的 GeoJSON 在线编辑器，可视化编辑地理数据。</p>
+          <div class="nav-card-meta">
+            <span class="badge">编辑器</span>
+            <span class="badge">GeoJSON</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://geojson.io/#new&map=6.21/6.145/42.128" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#dc2626">🗺️</div>
+            <h3 class="nav-card-title">GeoJSON编辑器-谷歌地图</h3>
+          </div>
+          <p class="nav-card-desc">基于谷歌地图的 GeoJSON 在线编辑器，可视化编辑地理数据。</p>
+          <div class="nav-card-meta">
+            <span class="badge">编辑器</span>
+            <span class="badge">GeoJSON</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://gisshow.github.io/wkttogeojosn/#/" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#3b82f6">🔧</div>
+            <h3 class="nav-card-title">WKT to GeoJSON</h3>
+          </div>
+          <p class="nav-card-desc">WKT 与 GeoJSON 格式互转工具，支持多种几何类型。</p>
+          <div class="nav-card-meta">
+            <span class="badge">格式转换</span>
+            <span class="badge">在线工具</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://igorgatis.github.io/ws2/" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#7c3aed">🔍</div>
+            <h3 class="nav-card-title">S2 Region Coverer</h3>
+          </div>
+          <p class="nav-card-desc">S2 区域覆盖在线查看器，可视化 S2 几何和区域。</p>
+          <div class="nav-card-meta">
+            <span class="badge">S2</span>
+            <span class="badge">可视化</span>
+          </div>
+        </a>
+
+        <a class="nav-card" href="https://geohash.softeng.co/wmtut" target="_blank" rel="noopener noreferrer">
+          <div class="nav-card-header">
+            <div class="nav-card-icon" style="background:#059669">🔢</div>
+            <h3 class="nav-card-title">Geohash Explorer</h3>
+          </div>
+          <p class="nav-card-desc">Geohash 编码探索工具，可视化地理哈希编码。</p>
+          <div class="nav-card-meta">
+            <span class="badge">Geohash</span>
+            <span class="badge">编码</span>
+          </div>
+        </a>
       </div>
     </section>
   </main>
